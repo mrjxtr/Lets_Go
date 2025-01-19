@@ -17,19 +17,25 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+
 	msg := fmt.Sprintf("Display a specific snippet with ID %d...", id)
 	w.Write([]byte(msg))
 }
 
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display a form to create snippet here"))
+	w.Write([]byte("Display a form to create snippet here..."))
+}
+
+func snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Save a new snippet here..."))
 }
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/{$}", home)
-	mux.HandleFunc("/snippet/view/{id}", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	mux.HandleFunc("GET /{$}", home)
+	mux.HandleFunc("GET /snippet/view/{id}", snippetView)
+	mux.HandleFunc("GET /snippet/create", snippetCreate)
+	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
 	log.Print("Starting server on :4000")
 
