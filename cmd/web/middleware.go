@@ -5,11 +5,13 @@ import (
 	"path/filepath"
 )
 
-type neuteredFileSystem struct {
+// Neutered implements http.FileSystem
+// to disable directory listing
+type Neutered struct {
 	fs http.FileSystem
 }
 
-func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
+func (nfs Neutered) Open(path string) (http.File, error) {
 	f, err := nfs.fs.Open(path)
 	if err != nil {
 		return nil, err
