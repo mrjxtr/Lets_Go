@@ -1,13 +1,19 @@
 package main
 
 import (
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func main() {
 	cfg := DevConfig() // ? Uncomment this line to use development config
 	// cfg := ProdConfig() // ? Uncomment this line to use production config
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		// AddSource: true, // ? This is to add the file and line number
+		Level: slog.LevelDebug,
+	}))
 
 	mux := http.NewServeMux()
 
@@ -21,8 +27,9 @@ func main() {
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
 	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
-	log.Printf("Starting server on %s", cfg.addr)
+	logger.Info("Starting server", "addr", cfg.addr)
 
 	err := http.ListenAndServe(cfg.addr, mux)
-	log.Fatal(err)
+	logger.Error(err.Error())
+	os.Exit(1)
 }
