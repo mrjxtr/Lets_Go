@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -35,4 +37,14 @@ func (nfs Neutered) Open(path string) (http.File, error) {
 	}
 
 	return f, nil
+}
+
+// initLogger returns a new structured logger
+func InitLogger() *slog.Logger {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		// AddSource: true, // ? This is to add the file and line number
+		Level: slog.LevelDebug,
+	}))
+
+	return logger
 }

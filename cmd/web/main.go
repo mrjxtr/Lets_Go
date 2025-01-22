@@ -1,20 +1,13 @@
 package main
 
 import (
-	"log/slog"
 	"net/http"
 	"os"
 )
 
 func main() {
-	cfg := DevConfig() // ? Uncomment this line to use development config
-	// cfg := ProdConfig() // ? Uncomment this line to use production config
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		// AddSource: true, // ? This is to add the file and line number
-		Level: slog.LevelDebug,
-	}))
-
+	cfg := DevConfig() // ? use ProdConfig() for production
+	logger := InitLogger()
 	mux := http.NewServeMux()
 
 	// Disabled FileServer directory listings using Neutered struct
