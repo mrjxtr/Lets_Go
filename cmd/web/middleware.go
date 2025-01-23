@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/mrjxtr/Lets_Go/config"
 )
 
 // Neutered implements http.FileSystem
@@ -47,4 +49,10 @@ func InitLogger() *slog.Logger {
 	}))
 
 	return logger
+}
+
+func InitApp() *config.Application {
+	return &config.Application{
+		Logger: InitLogger(),
+	}
 }

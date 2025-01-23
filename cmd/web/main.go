@@ -3,15 +3,21 @@ package main
 import (
 	"net/http"
 	"os"
+
+	"github.com/mrjxtr/Lets_Go/config"
 )
 
 func main() {
-	cfg := DevConfig() // ? use ProdConfig() for production
-	logger := InitLogger()
+	cfg := config.DevConfig() // ? use ProdConfig() for production
+	app := InitApp()
+	// logger := InitLogger()
+	// app := &config.Application{
+	// 	Logger: logger,
+	// }
 	mux := http.NewServeMux()
 
 	// Disabled FileServer directory listings using Neutered struct
-	fileServer := http.FileServer(Neutered{http.Dir(cfg.staticDir)})
+	fileServer := http.FileServer(Neutered{http.Dir(cfg.StaticDir)})
 	mux.Handle("GET /static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
@@ -20,9 +26,9 @@ func main() {
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
 	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
-	logger.Info("Starting server", "addr", cfg.addr)
+	app.Logger.Info("Starting server", "addr", cfg.Addr)
 
-	err := http.ListenAndServe(cfg.addr, mux)
-	logger.Error(err.Error())
+	err := http.ListenAndServe(cfg.Addr, mux)
+	app.Logger.Error(err.Error())
 	os.Exit(1)
 }

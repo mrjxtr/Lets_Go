@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"text/template"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
+	app := InitApp()
 	w.Header().Add("Server", "GO")
 
 	files := []string{
@@ -19,14 +19,28 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Print(err.Error())
+		app.Logger.Error(
+			err.Error(),
+			"method",
+			r.Method,
+			"uri",
+			r.URL.RequestURI(),
+		)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
+	} else {
+		app.Logger.Info("Success", "method", r.Method, "uri", r.URL.RequestURI())
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		log.Print(err.Error())
+		app.Logger.Error(
+			err.Error(),
+			"method",
+			r.Method,
+			"uri",
+			r.URL.RequestURI(),
+		)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
