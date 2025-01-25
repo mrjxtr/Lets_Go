@@ -7,6 +7,7 @@ import (
 type ServerCfg struct {
 	Addr      string
 	StaticDir string
+	Sqlite3   string
 }
 
 // DevConfig returns the config for the development environment
@@ -19,6 +20,12 @@ func DevConfig() *ServerCfg {
 		"static-dir",
 		"./ui/static/",
 		"Path to static assets",
+	)
+	flag.StringVar(
+		&cfg.Sqlite3,
+		"sqlite3",
+		"./data/snippetbox.db",
+		"Sqlite database",
 	)
 
 	flag.Parse()

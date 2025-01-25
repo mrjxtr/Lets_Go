@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/mrjxtr/Lets_Go/config"
 )
@@ -22,6 +25,13 @@ func main() {
 		Level: slog.LevelDebug,
 	}))
 
+	db, err := openDB(cfg.Sqlite3)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	defer db.Close()
+
 	app := &application{
 		logger: logger,
 	}
@@ -29,7 +39,22 @@ func main() {
 	// Running server
 	app.logger.Info("Starting server", "addr", cfg.Addr)
 
-	err := http.ListenAndServe(cfg.Addr, app.routes())
+	err = http.ListenAndServe(cfg.Addr, app.routes())
 	app.logger.Error(err.Error())
 	os.Exit(1)
+}
+
+func openDB(sqlite3 string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", sqlite3)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+
+	return db, nil
 }
