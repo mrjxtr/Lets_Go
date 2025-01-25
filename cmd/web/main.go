@@ -12,10 +12,11 @@ type application struct {
 	logger *slog.Logger
 }
 
+// Configuration
 var cfg = config.DevConfig() // ? use ProdConfig() for production
 
 func main() {
-	// initLogger returns a new structured logger
+	// Dependencies
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
 		// AddSource: true, // ? This is to add the file and line number
 		Level: slog.LevelDebug,
@@ -25,6 +26,7 @@ func main() {
 		logger: logger,
 	}
 
+	// Running server
 	app.logger.Info("Starting server", "addr", cfg.Addr)
 
 	err := http.ListenAndServe(cfg.Addr, app.routes())
