@@ -7,8 +7,7 @@ import (
 	"text/template"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	app := InitApp()
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Server", "GO")
 
 	files := []string{
@@ -19,33 +18,17 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		app.Logger.Error(
-			err.Error(),
-			"method",
-			r.Method,
-			"uri",
-			r.URL.RequestURI(),
-		)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serveError(w, r, err)
 		return
-	} else {
-		app.Logger.Info("Success", "method", r.Method, "uri", r.URL.RequestURI())
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		app.Logger.Error(
-			err.Error(),
-			"method",
-			r.Method,
-			"uri",
-			r.URL.RequestURI(),
-		)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serveError(w, r, err)
 	}
 }
 
-func snippetView(w http.ResponseWriter, r *http.Request) {
+func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
@@ -55,11 +38,14 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
 }
 
-func snippetCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Display a form to create snippet here..."))
 }
 
-func snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+func (app *application) snippetCreatePost(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Save a new snippet here..."))
 }

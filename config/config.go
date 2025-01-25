@@ -2,12 +2,7 @@ package config
 
 import (
 	"flag"
-	"log/slog"
 )
-
-type Application struct {
-	Logger *slog.Logger
-}
 
 type ServerCfg struct {
 	Addr      string
