@@ -9,10 +9,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/mrjxtr/Lets_Go/config"
+	"github.com/mrjxtr/Lets_Go/internal/models"
 )
 
 type application struct {
-	logger *slog.Logger
+	logger   *slog.Logger
+	snippets *models.SnippetModel
 }
 
 // Configuration
@@ -33,7 +35,8 @@ func main() {
 	defer db.Close()
 
 	app := &application{
-		logger: logger,
+		logger:   logger,
+		snippets: &models.SnippetModel{DB: db},
 	}
 
 	// Running server
