@@ -46,10 +46,10 @@ func (m *SnippetModel) Insert(
 func (m *SnippetModel) Get(id int) (Snippet, error) {
 	// Use strftime to format the datetime as a string in a format Go can parse
 	stmt := `SELECT id, title, content, 
-		strftime('%Y-%m-%d %H:%M:%S', created) as created,
-		strftime('%Y-%m-%d %H:%M:%S', expires) as expires
-		FROM snippets 
-		WHERE expires > datetime('now') AND id = ?`
+                strftime('%Y-%m-%d %H:%M:%S', created) as created,
+                strftime('%Y-%m-%d %H:%M:%S', expires) as expires
+            FROM snippets 
+            WHERE expires > datetime('now') AND id = ?`
 
 	// Temporary variables to hold the datetime strings
 	var createdStr, expiresStr string
@@ -62,7 +62,6 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 		&createdStr,
 		&expiresStr,
 	)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Snippet{}, ErrNoRecord
@@ -86,5 +85,56 @@ func (m *SnippetModel) Get(id int) (Snippet, error) {
 
 // Returns the 10 most recently created snippets
 func (m *SnippetModel) Latest() ([]Snippet, error) {
-	return nil, nil
+	stmt := `SELECT id, title, content,
+                strftime('%Y-%m-%d %H:%M:%S', created) as created,
+                strftime('%Y-%m-%d %H:%M:%S', expires) as expires
+            FROM snippets
+            WHERE expires > datetime('now')
+            ORDER BY id DESC LIMIT 10`
+
+	// Temporary variables to hold the datetime strings
+	var createdStr, expiresStr string
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var snippets []Snippet
+
+	for rows.Next() {
+		var s Snippet
+
+		err := rows.Scan(
+			&s.ID,
+			&s.Title,
+			&s.Content,
+			&createdStr,
+			&expiresStr,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		// Parse the datetime strings into time.Time
+		s.Created, err = time.Parse("2006-01-02 15:04:05", createdStr)
+		if err != nil {
+			return nil, err
+		}
+
+		s.Expires, err = time.Parse("2006-01-02 15:04:05", expiresStr)
+		if err != nil {
+			return nil, err
+		}
+
+		snippets = append(snippets, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return snippets, nil
 }
