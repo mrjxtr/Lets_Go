@@ -11,6 +11,7 @@ func (app *application) routes() http.Handler {
 
 	// Disabled FileServer directory listings using Neutered struct
 	fileServer := http.FileServer(Neutered{http.Dir(cfg.StaticDir)})
+
 	mux.Handle("GET /static", http.NotFoundHandler())
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
