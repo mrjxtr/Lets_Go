@@ -1,4 +1,6 @@
-.env
 .vscode/
+tmp/
+
+.env
 .code-workspace
 .DS_Store
